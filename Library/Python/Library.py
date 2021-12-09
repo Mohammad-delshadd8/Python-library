@@ -3,8 +3,11 @@ from os import system
 #--------------------sign in menu-----------------------
 loginCheck=0
 while loginCheck ==0:
-    userName = input("Enter your Username please : \n")
-    password = input("Enter your password please : \n")
+    # userName = input("Enter your Username please : \n")
+    # password = input("Enter your password please : \n")
+    userName = "Mohammad"
+    password = "12345"
+
 
     try:
         mydb = mysql.connector.connect(
@@ -50,12 +53,52 @@ def newCustomer():
     mydb.commit()
     print(mycursor.rowcount, "record inserted.")
 # ----------------------------------------------------------
+#--------------------Book list-----------------------
+def ShowListOfBokks():
+    mycursor = mydb.cursor()
+
+    mycursor.execute("SELECT * FROM books")
+
+    myresult = mycursor.fetchall()
+
+    for x in myresult:
+      print("*"*100)
+
+      print(x)
+      print("*" * 100)
+# ----------------------------------------------------------
+#--------------------Borrow-----------------------
+def borrow():
+    ShowListOfBokks()
+    bID=input("please enter id of the book \n")
+    code=input("please enter your national code \n")
+    mycursor = mydb.cursor()
+
+    sql = "SELECT MemberId FROM members WHERE National ="+code
+    mycursor.execute(sql)
+    memberID = mycursor.fetchall()
+    #print(memberID[0][0])
+    sql2 = "INSERT INTO borrowed (BookID, MemberID) VALUES (%s, %s)"
+    val2 = (bID, memberID[0][0])
+    mycursor.execute(sql2, val2)
+    mydb.commit()
+    print(mycursor.rowcount, "record inserted.")
+
+
+
+
+
+# ----------------------------------------------------------
 #--------------------Main menu-----------------------
 menuBtn = 5
 while menuBtn != 0:
-    menuBtn = int(input("Enter 1 for adding new book \n Enter 2 for adding new customer \n Enter 0 to EXIT \n"))
+    menuBtn = int(input(" Enter 1 for adding new book \n Enter 2 for adding new customer \n Enter 3 to show list of books  \n  Enter 4 to borrow books  \n Enter 0 to EXIT \n"))
     if menuBtn == 1:
         newBook()
     if menuBtn == 2:
         newCustomer()
+    if menuBtn == 3:
+        ShowListOfBokks()
+    if menuBtn == 4:
+        borrow()
 # ----------------------------------------------------------
