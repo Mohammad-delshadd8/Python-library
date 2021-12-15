@@ -3,10 +3,10 @@ from os import system
 #--------------------sign in menu-----------------------
 loginCheck=0
 while loginCheck ==0:
-    # userName = input("Enter your Username please : \n")
-    # password = input("Enter your password please : \n")
-    userName = "Mohammad"
-    password = "12345"
+    userName = input("Enter your Username please : \n")
+    password = input("Enter your password please : \n")
+    userName = userName
+    password = password
 
 
     try:
@@ -74,25 +74,34 @@ def borrow():
     code=input("please enter your national code \n")
     mycursor = mydb.cursor()
 
-    sql = "SELECT MemberId FROM members WHERE National ="+code
-    mycursor.execute(sql)
-    memberID = mycursor.fetchall()
-    #print(memberID[0][0])
-    sql2 = "INSERT INTO borrowed (BookID, MemberID) VALUES (%s, %s)"
-    val2 = (bID, memberID[0][0])
-    mycursor.execute(sql2, val2)
-    mydb.commit()
-    print(mycursor.rowcount, "record inserted.")
+    sql3 = "SELECT Count FROM books WHERE BookID =" + bID
+    mycursor.execute(sql3)
+    result = mycursor.fetchall()
+    count = int(result[0][0])
+    newCount = int(result[0][0]) - 1
+    if count>0:
+        sql = "SELECT MemberId FROM members WHERE National ="+code
+        mycursor.execute(sql)
+        memberID = mycursor.fetchall()
+
+        sql2 = "INSERT INTO borrowed (BookID, MemberID) VALUES (%s, %s)"
+        val2 = (bID, memberID[0][0])
+        mycursor.execute(sql2, val2)
+        mydb.commit()
+        print(mycursor.rowcount, "record inserted.")
 
 
 
-
-
+        sql4 = "UPDATE books SET count ="+str(newCount) +" WHERE BookID =" +bID
+        mycursor.execute(sql4)
+        mydb.commit()
+    else:
+        print("This book is not available now please try later")
 # ----------------------------------------------------------
-#--------------------Main menu-----------------------
+#--------------------Main menu-----------------------------
 menuBtn = 5
 while menuBtn != 0:
-    menuBtn = int(input(" Enter 1 for adding new book \n Enter 2 for adding new customer \n Enter 3 to show list of books  \n  Enter 4 to borrow books  \n Enter 0 to EXIT \n"))
+    menuBtn = int(input(" Enter 1 for adding new book \n Enter 2 for adding new customer \n Enter 3 to show list of books  \n Enter 4 to borrow books  \n Enter 0 to EXIT \n"))
     if menuBtn == 1:
         newBook()
     if menuBtn == 2:
@@ -101,4 +110,6 @@ while menuBtn != 0:
         ShowListOfBokks()
     if menuBtn == 4:
         borrow()
+    else:
+        print("Invalid key please try again \n")
 # ----------------------------------------------------------
